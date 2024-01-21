@@ -1,0 +1,23 @@
+[package]
+name = "bootnode"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+futures = "0.3.30"
+
+async-std = { version = "1.12", features = ["attributes", "unstable"] }
+async-trait = "0.1"
+
+libp2p = { version = "0.53.2", features = ["async-std", "request-response", "cbor", "gossipsub", "mdns", "kad", "dns", "quic", "identify", "noise", "macros", "tcp", "yamux", "serde", "rsa"] }
+
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+clap = { version = "4.3.21", features = ["derive"] }
+
+local-ip-address = "0.5.6"
+
+comms = {path = "../comms"}
