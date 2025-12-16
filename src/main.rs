@@ -21,7 +21,7 @@ use libp2p::{
 use tracing_subscriber::EnvFilter;
 use clap::Parser;
 
-use comms::p2p::{
+use peyk::p2p::{
     BootNodeBehaviourEvent,
     setup_swarm_for_bootnode
 };
@@ -41,7 +41,7 @@ use comms::p2p::{
 #[command(about = "Yet another verifiable compute marketplace.", long_about = None)]
 struct Cli {
     #[arg(short, long)]
-    key: String,
+    key_file: Option<String>,
 }
 
 #[async_std::main]
@@ -50,11 +50,30 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .with_env_filter(EnvFilter::from_default_env())
         .try_init();
 
-    // import the keypair
     let cli = Cli::parse();
-    let bytes = std::fs::read(cli.key).unwrap();
-    let local_key = identity::Keypair::from_protobuf_encoding(&bytes)?;
-    println!("{:?}", PeerId::from_public_key(&local_key.public()));
+
+    // key 
+    let local_key = {
+        if let Some(key_file) = cli.key_file {
+            let bytes = std::fs::read(key_file).unwrap();
+            identity::Keypair::from_protobuf_encoding(&bytes)?
+        } else {
+            // Create a random key for ourselves
+            let new_key = identity::Keypair::generate_ed25519();
+            let bytes = new_key.to_protobuf_encoding().unwrap();
+            let _bw = std::fs::write("./key.secret", bytes);
+            println!("No keys were supplied, so one is generated for you and saved to `./key.secret` file.");
+            new_key
+        }
+    };   
+    println!("my peer id: `{:?}`", PeerId::from_public_key(&local_key.public()));    
+ 
+
+    // import the keypair
+    // let bytes = std::fs::read(cli.key).unwrap();
+    // let local_key = identity::Keypair::from_protobuf_encoding(&bytes)?;
+    // println!("{:?}", PeerId::from_public_key(&local_key.public()));
+
     // Create a random key for ourself
     // let local_key = identity::Keypair::generate_ed25519();
     // let bytes = local_key.to_protobuf_encoding().unwrap();
@@ -68,7 +87,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //         .behaviour_mut()
     //         .add_address(&peer.parse()?, "/dnsaddr/bootstrap.libp2p.io".parse()?);
     // }
-    let mut swarm = setup_swarm_for_bootnode(&local_key).await?;
+    let mut swarm = setup_swarm_for_bootnode(&local_key)?;
     // let mut swarm = libp2p::SwarmBuilder::with_existing_identity(local_key.clone())
     //     .with_async_std()
     //     .with_tcp(
