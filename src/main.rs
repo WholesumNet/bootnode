@@ -11,11 +11,7 @@ use futures::{
     StreamExt, select
 };
 
-use tokio::{
-    time::{
-    self, interval
-    },
-};
+use tokio::time::interval;
 use tokio_stream::wrappers::IntervalStream;
 
 use libp2p::{
