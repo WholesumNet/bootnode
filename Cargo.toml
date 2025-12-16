@@ -8,7 +8,8 @@ edition = "2021"
 [dependencies]
 futures = "0.3.30"
 
-async-std = { version = "1.12", features = ["attributes", "unstable"] }
+tokio = { version = "1.45.1", features = ["macros"] }
+tokio-stream = "0.1.17"
 async-trait = "0.1"
 
 libp2p = { version = "0.53.2", features = ["async-std", "request-response", "cbor", "gossipsub", "mdns", "kad", "dns", "quic", "identify", "noise", "macros", "tcp", "yamux", "serde", "rsa"] }
@@ -21,3 +22,4 @@ clap = { version = "4.3.21", features = ["derive"] }
 local-ip-address = "0.5.6"
 
 peyk = {path = "../peyk"}
+anyhow = "1.0.100"

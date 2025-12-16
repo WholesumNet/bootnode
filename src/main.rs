@@ -1,21 +1,30 @@
 
 #![doc = include_str!("../README.md")]
 
-use std::error::Error;
 // use std::num::NonZeroUsize;
 // use std::ops::Add;
-use std::time::{Duration};
+use std::time::{
+    Duration
+};
 
 use futures::{
     StreamExt, select
 };
-use async_std::stream;
+
+use tokio::{
+    time::{
+    self, interval
+    },
+};
+use tokio_stream::wrappers::IntervalStream;
 
 use libp2p::{
     identity, identify, 
     kad,
     PeerId,
-    swarm::{SwarmEvent},
+    swarm::{
+        SwarmEvent
+    },
 };
 
 use tracing_subscriber::EnvFilter;
@@ -44,8 +53,8 @@ struct Cli {
     key_file: Option<String>,
 }
 
-#[async_std::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let _ = tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .try_init();
@@ -110,14 +119,16 @@ async fn main() -> Result<(), Box<dyn Error>> {
     swarm.listen_on("/ip6/::1/tcp/20201".parse()?)?;
     swarm.listen_on("/ip6/::1/udp/20201/quic-v1".parse()?)?;
 
-
-    let mut timer_peer_discovery = stream::interval(Duration::from_secs(60)).fuse();
+    let mut timer_peer_discovery = IntervalStream::new(
+        interval(Duration::from_secs(60))
+    )
+    .fuse();
     
     println!("protocol names: {:#?}", swarm.behaviour_mut().kademlia.protocol_names());
     loop {
         select! {
             // try to discover new peers
-            () = timer_peer_discovery.select_next_some() => {
+            _i = timer_peer_discovery.select_next_some() => {
                 let random_peer_id = PeerId::random();
                 println!("Searching for the closest peers to `{random_peer_id}`");
                 swarm.behaviour_mut()
