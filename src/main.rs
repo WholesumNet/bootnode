@@ -110,10 +110,10 @@ async fn main() -> anyhow::Result<()> {
     //     })?
     //     .with_swarm_config(|c| c.with_idle_connection_timeout(Duration::from_secs(5)))
     //     .build();
-    swarm.listen_on("/ip4/127.0.0.1/udp/20201/quic-v1".parse()?)?;
-    swarm.listen_on("/ip4/127.0.0.1/tcp/20201".parse()?)?;
-    swarm.listen_on("/ip6/::1/tcp/20201".parse()?)?;
-    swarm.listen_on("/ip6/::1/udp/20201/quic-v1".parse()?)?;
+    swarm.listen_on("/ip4/0.0.0.0/udp/20201/quic-v1".parse()?)?;
+    swarm.listen_on("/ip4/0.0.0.0/tcp/20201".parse()?)?;
+    swarm.listen_on("/ip6/::/tcp/20201".parse()?)?;
+    swarm.listen_on("/ip6/::/udp/20201/quic-v1".parse()?)?;
 
     let mut timer_peer_discovery = IntervalStream::new(
         interval(Duration::from_secs(60))
