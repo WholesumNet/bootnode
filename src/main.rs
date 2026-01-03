@@ -1,17 +1,10 @@
 
 #![doc = include_str!("../README.md")]
 
-use std::{
-    time::Duration,
-    env,
-};
-
+use std::time::Duration;
 use futures::{
     StreamExt, select
 };
-
-use anyhow::Context;
-
 use tokio::time::interval;
 use tokio_stream::wrappers::IntervalStream;
 
@@ -29,7 +22,7 @@ use libp2p::{
 use tracing_subscriber::EnvFilter;
 use clap::Parser;
 
-use peyk::p2p::{
+use peyk::bootnode::{
     BootNodeBehaviourEvent,
     setup_swarm_for_bootnode
 };
@@ -83,7 +76,7 @@ async fn main() -> anyhow::Result<()> {
     )
     .fuse();
     
-    println!("Protocol names: {:#?}", swarm.behaviour_mut().kademlia.protocol_names());
+    // println!("Protocol names: {:#?}", swarm.behaviour_mut().kademlia.protocol_names());
     loop {
         select! {
             // try to discover new peers
